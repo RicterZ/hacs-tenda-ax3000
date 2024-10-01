@@ -1,3 +1,4 @@
+import codecs
 import hashlib
 import json
 import logging
@@ -61,66 +62,3 @@ class TendaDeviceScanner(DeviceScanner):
         self.last_results = self.tenda_client.get_connected_devices()
 
 
-class TendaClient:
-    def __init__(self, host: str, password: str) -> None:
-        self.host = host
-        self.password = password
-        self.cookies = None
-        self.is_authorized = None
-
-    def auth(self):
-        _LOGGER.debug("Trying to authorize")
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        }
-
-        data = (
-                "username=admin&password=" + hashlib.md5(self.password.encode()).hexdigest()
-        )
-        response = requests.post(
-            "http://" + self.host + "/login/Auth",
-            headers=headers,
-            data=data,
-            verify=False,
-            allow_redirects=False,
-        )
-        self.cookies = response.cookies
-
-    def get_connected_devices(self):
-        if self.cookies is None:
-            _LOGGER.debug("Cookies not found")
-            self.auth()
-
-        response = requests.get(
-            "http://" + self.host + "/goform/getOnlineList?" + str(time()),
-            verify=False,
-            cookies=self.cookies,
-            allow_redirects=False,
-        )
-
-        try:
-            json_response = json.loads(response.content)
-        except json.JSONDecodeError:
-            self.cookies = None
-            return self.get_connected_devices()
-
-        devices = {}
-
-        for device in json_response:
-            mac = None
-            name = None
-
-            if "deviceId" in device:
-                mac = device.get("deviceId")
-            elif "localhostName" in device:
-                mac = device.get("localhostMac")
-
-            if "devName" in device:
-                name = device.get("devName")
-            elif "localhostName" in device:
-                name = device.get("localhostName")
-
-            if mac is not None and name is not None:
-                devices[mac] = name
-
-        return devices
