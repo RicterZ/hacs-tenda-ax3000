@@ -1,3 +1,4 @@
+import json.decoder
 import logging
 import base64
 import requests
@@ -50,8 +51,9 @@ class TendaClient:
     def get_network_status(self) -> object:
         data = {'getSystemStatus': '', 'getNetwork': '', 'getTracfficStat': ''}
         response = requests.post(self.url, json=data, cookies=self.cookies,
-                                 verify=False, allow_redirects=False).json()
-        return response
+                                 verify=False, allow_redirects=False)
+        print(response)
+        return response.json()
 
     @check_cookie
     def get_connected_devices(self) -> object:

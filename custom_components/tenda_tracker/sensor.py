@@ -19,7 +19,7 @@ from .client import TendaClient
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_HOST): cv.string,
-    vol.Optional(CONF_PASSWORD): cv.string,
+    vol.Required(CONF_PASSWORD): cv.string,
 })
 
 
@@ -36,6 +36,7 @@ def setup_platform(
     host = config[CONF_HOST]
     password = config.get(CONF_PASSWORD)
     client = TendaClient(host, password)
+    print(host, password)
     add_entities([TendaUploadSensor(client), TendaDownloadSensor(client)])
 
 
