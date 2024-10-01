@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from client import TendaClient
+from .client import TendaClient
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
