@@ -52,7 +52,6 @@ class TendaClient:
         data = {'getSystemStatus': '', 'getNetwork': '', 'getTracfficStat': ''}
         response = requests.post(self.url, json=data, cookies=self.cookies,
                                  verify=False, allow_redirects=False)
-        print(response)
         return response.json()
 
     @check_cookie

@@ -36,7 +36,6 @@ def setup_platform(
     host = config[CONF_HOST]
     password = config.get(CONF_PASSWORD)
     client = TendaClient(host, password)
-    print(host, password)
     add_entities([TendaUploadSensor(client), TendaDownloadSensor(client)])
 
 
