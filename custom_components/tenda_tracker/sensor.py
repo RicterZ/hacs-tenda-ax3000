@@ -50,7 +50,6 @@ class TendaUploadSensor(SensorEntity):
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
-        self.entity_id = generate_entity_id()
         super(TendaUploadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
@@ -81,7 +80,6 @@ class TendaDownloadSensor(SensorEntity):
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
-        self.entity_id = generate_entity_id()
         super(TendaDownloadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
