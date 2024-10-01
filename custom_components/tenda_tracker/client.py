@@ -1,7 +1,6 @@
 import logging
-import codecs
+import base64
 import requests
-import json
 import os
 
 
@@ -9,79 +8,61 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class TendaClient:
+    _instance_map = {}
+
     def __init__(self, host: str, password: str) -> None:
         self.host = host
         self.password = password
         self.cookies = None
         self.is_authorized = None
+        self.url = f'http://{self.host}/goform/module'
+
+    def __new__(cls, *args, **kwargs):
+        if args[0] in cls._instance_map:
+            return cls._instance_map[args[0]]
+
+        obj = object.__new__(cls)
+        cls._instance_map[args[0]] = obj
+        return obj
 
     def auth(self):
-        _LOGGER.debug("Trying to authorize")
-        headers = {
-            'x-requested-with': 'XMLHttpRequest',
-        }
+        _LOGGER.info('Trying to authorize')
 
-        data = {
-            'auth': {
-                'password': codecs.encode(self.password.encode(), 'base64').decode().replace('\n', ''),
-            }
-        }
+        data = {'auth': {'password': base64.b64encode(self.password.encode()).decode()}}
         response = requests.post(
-            f"http://{self.host}/goform/module",
-            headers=headers,
+            self.url,
             json=data,
             verify=False,
             allow_redirects=False,
         )
         self.cookies = response.cookies
+        _LOGGER.info(f'Cookie: {self.cookies}')
 
-    def get_network_status(self):
-        url = f'http://{self.host}/goform/module?getSystemStatus&getNetwork&getTracfficStat'
-        data = {"getSystemStatus": "", "getNetwork": "", "getTracfficStat": ""}
-        response = requests.post(url, json=data, cookies=self.cookies).json()
+    def check_cookie(func: classmethod, *args, **kwargs):
+        def wrap(self) -> object:
+            if self.cookies is None:
+                _LOGGER.info('Cookies not found')
+                self.auth()
+            return func(self)
+        return wrap
+
+    @check_cookie
+    def get_network_status(self) -> object:
+        data = {'getSystemStatus': '', 'getNetwork': '', 'getTracfficStat': ''}
+        response = requests.post(self.url, json=data, cookies=self.cookies,
+                                 verify=False, allow_redirects=False).json()
         return response
 
-    def get_connected_devices(self):
-        if self.cookies is None:
-            _LOGGER.debug("Cookies not found")
-            self.auth()
+    @check_cookie
+    def get_connected_devices(self) -> object:
+        data = {'getQosUserList': {'type': 1}}
+        response = requests.post(self.url, json=data, cookies=self.cookies,
+                                 verify=False, allow_redirects=False).json()
 
-        response = requests.get(
-            "http://" + self.host + "/goform/getOnlineList",
-            verify=False,
-            cookies=self.cookies,
-            allow_redirects=False,
-        )
-
-        try:
-            json_response = json.loads(response.content)
-        except json.JSONDecodeError:
-            self.cookies = None
-            return self.get_connected_devices()
-
-        devices = {}
-
-        for device in json_response:
-            mac = None
-            name = None
-
-            if "deviceId" in device:
-                mac = device.get("deviceId")
-            elif "localhostName" in device:
-                mac = device.get("localhostMac")
-
-            if "devName" in device:
-                name = device.get("devName")
-            elif "localhostName" in device:
-                name = device.get("localhostName")
-
-            if mac is not None and name is not None:
-                devices[mac] = name
-
-        return devices
+        return response['getQosUserList']
 
 
 if __name__ == '__main__':
+    from pprint import pprint
     client = TendaClient('192.168.13.37', os.getenv('PASSWORD'))
-    client.auth()
-    print(client.get_network_status())
+    pprint(client.get_network_status())
