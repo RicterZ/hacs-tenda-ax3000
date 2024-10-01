@@ -1,1 +1,1 @@
-"""The Tenda AC23 Router Device Tracker integration."""
+"""The Tenda AX3000 Router Device Tracker integration."""

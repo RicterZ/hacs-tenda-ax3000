@@ -1,5 +1,5 @@
 {
-  "domain": "tenda_tracker",
+  "domain": "tenda_ax3000_tracker",
   "name": "Tenda AX3000 Router Device Tracker",
   "version": "0.0.1",
   "config_flow": false,

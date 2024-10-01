@@ -44,7 +44,14 @@ class TendaClient:
             if self.cookies is None:
                 _LOGGER.info('Cookies not found')
                 self.auth()
-            return func(self)
+            try:
+                resp = func(self)
+            except Exception as e:
+                print(e)
+                self.auth()
+                resp = func(self)
+
+            return resp
         return wrap
 
     @check_cookie

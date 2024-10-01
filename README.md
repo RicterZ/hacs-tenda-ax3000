@@ -1,6 +1,4 @@
-## Tenda AC23 Router Device Tracker
-
-Adds device tracking support for [Tenda AC23](https://www.tendacn.com/product/AC23.html) to [Home Assistant](https://www.home-assistant.io/).
+## Tenda AX3000 Router State
 
 ## Setup Process
 
@@ -25,7 +23,7 @@ Now that that installation and authentication are done, all that is left is to a
 The minimum required configuration:
 
 ```yaml
-device_tracker:
+sensor:
   - platform: tenda_tracker
     host: 192.168.1.1
     password: <password to admin panel>

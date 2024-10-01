@@ -43,6 +43,7 @@ def setup_platform(
 class TendaUploadSensor(SensorEntity):
 
     _attr_name = "Tenda Router Upload Speed"
+    _attr_unique_id = 'tenda_ax3000_upload_speed'
     _attr_native_unit_of_measurement = UnitOfDataRate.KILOBYTES_PER_SECOND
     _attr_device_class = SensorDeviceClass.DATA_RATE
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -73,6 +74,7 @@ class TendaUploadSensor(SensorEntity):
 class TendaDownloadSensor(SensorEntity):
 
     _attr_name = "Tenda Router Download Speed"
+    _attr_unique_id = 'tenda_ax3000_download_speed'
     _attr_native_unit_of_measurement = UnitOfDataRate.KILOBYTES_PER_SECOND
     _attr_device_class = SensorDeviceClass.DATA_RATE
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -80,7 +82,6 @@ class TendaDownloadSensor(SensorEntity):
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
-        super(TendaDownloadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
         self._attr_native_value = 0
