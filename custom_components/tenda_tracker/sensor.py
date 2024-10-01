@@ -13,6 +13,7 @@ from homeassistant.const import UnitOfInformation, CONF_HOST, CONF_PASSWORD, Uni
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.entity import generate_entity_id
 
 from .client import TendaClient
 
@@ -49,7 +50,7 @@ class TendaUploadSensor(SensorEntity):
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
-        self.entity_id = 'tenda_ax3000_upload_speed_' + self._client.host.replace('.', '_')
+        self.entity_id = generate_entity_id()
         super(TendaUploadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
@@ -80,7 +81,7 @@ class TendaDownloadSensor(SensorEntity):
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
-        self.entity_id = 'tenda_ax3000_download_speed_' + self._client.host.replace('.', '_')
+        self.entity_id = generate_entity_id()
         super(TendaDownloadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
