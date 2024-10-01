@@ -1,4 +1,5 @@
 import voluptuous as vol
+import os
 import logging
 import homeassistant.helpers.config_validation as cv
 
@@ -23,6 +24,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 _LOGGER = logging.getLogger(__name__)
+
 
 def setup_platform(
     hass: HomeAssistant,
@@ -59,8 +61,8 @@ class TendaUploadSensor(SensorEntity):
         network = network[0]
         speed = network['wanUpFlux']
 
-        rate = float(speed[-4:])
-        measurement = speed[:-4]
+        rate = float(speed[:-4])
+        measurement = speed[-4:]
         if measurement == 'MB/s':
             rate = rate * 1024.0
 
@@ -89,9 +91,20 @@ class TendaDownloadSensor(SensorEntity):
         network = network[0]
         speed = network['wanDownFlux']
 
-        rate = float(speed[-4:])
-        measurement = speed[:-4]
+        rate = float(speed[:-4])
+        measurement = speed[-4:]
         if measurement == 'MB/s':
             rate = rate * 1024.0
 
         self._attr_native_value = rate
+
+
+if __name__ == '__main__':
+    client = TendaClient('192.168.13.37', os.getenv('PASSWORD'))
+    sensor = TendaUploadSensor(client)
+    sensor.update()
+    print(sensor._attr_native_value)
+
+    sensor = TendaDownloadSensor(client)
+    sensor.update()
+    print(sensor._attr_native_value)
