@@ -9,7 +9,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
     PLATFORM_SCHEMA
 )
-from homeassistant.const import UnitOfInformation, CONF_HOST, CONF_PASSWORD
+from homeassistant.const import UnitOfInformation, CONF_HOST, CONF_PASSWORD, UnitOfDataRate
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -43,13 +43,14 @@ def setup_platform(
 class TendaUploadSensor(SensorEntity):
 
     _attr_name = "Tenda Router Upload Speed"
-    _attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
+    _attr_native_unit_of_measurement = UnitOfDataRate.KILOBYTES_PER_SECOND
     _attr_device_class = SensorDeviceClass.DATA_RATE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _client: TendaClient = None
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
+        self.entity_id = self._client.host.replace('.', '_')
         super(TendaUploadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
@@ -73,13 +74,14 @@ class TendaUploadSensor(SensorEntity):
 class TendaDownloadSensor(SensorEntity):
 
     _attr_name = "Tenda Router Download Speed"
-    _attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
+    _attr_native_unit_of_measurement = UnitOfDataRate.KILOBYTES_PER_SECOND
     _attr_device_class = SensorDeviceClass.DATA_RATE
     _attr_state_class = SensorStateClass.MEASUREMENT
     _client = None
 
     def __init__(self, client, *args, **kwargs):
         self._client = client
+        self.entity_id = self._client.host.replace('.', '_')
         super(TendaDownloadSensor, self).__init__(*args, **kwargs)
 
     def update(self) -> None:
@@ -101,11 +103,11 @@ class TendaDownloadSensor(SensorEntity):
 
 
 if __name__ == '__main__':
-    client = TendaClient('192.168.13.37', os.getenv('PASSWORD'))
-    sensor = TendaUploadSensor(client)
+    c = TendaClient('192.168.13.37', os.getenv('PASSWORD'))
+    sensor = TendaUploadSensor(c)
     sensor.update()
     print(sensor._attr_native_value)
 
-    sensor = TendaDownloadSensor(client)
+    sensor = TendaDownloadSensor(c)
     sensor.update()
     print(sensor._attr_native_value)
